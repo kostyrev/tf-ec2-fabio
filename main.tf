@@ -92,12 +92,20 @@ resource "aws_security_group_rule" "fabio-ssh" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-// This rule allows fabio HTTP API access to individual nodes
-resource "aws_security_group_rule" "fabio-http-api" {
+resource "aws_security_group_rule" "fabio-http-services" {
   security_group_id = "${aws_security_group.fabio.id}"
   type              = "ingress"
   from_port         = 9999
   to_port           = 9999
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "fabio-http-api" {
+  security_group_id = "${aws_security_group.fabio.id}"
+  type              = "ingress"
+  from_port         = 9998
+  to_port           = 9998
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
 }
@@ -120,6 +128,13 @@ resource "aws_elb" "fabio" {
   internal                    = false
   subnets                     = ["${split(",", var.subnets)}"]
   security_groups             = ["${aws_security_group.elb.id}"]
+
+  listener {
+    instance_port     = 9998
+    instance_protocol = "tcp"
+    lb_port           = 9998
+    lb_protocol       = "tcp"
+  }
 
   listener {
     instance_port     = 9999
@@ -169,6 +184,15 @@ resource "aws_security_group_rule" "fabio-elb-https" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+resource "aws_security_group_rule" "fabio-elb-api" {
+  security_group_id = "${aws_security_group.elb.id}"
+  type              = "ingress"
+  from_port         = 9998
+  to_port           = 9998
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
 resource "aws_security_group_rule" "fabio-elb-egress" {
   security_group_id = "${aws_security_group.elb.id}"
   type              = "egress"
@@ -176,14 +200,4 @@ resource "aws_security_group_rule" "fabio-elb-egress" {
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
-}
-
-// This rule allows elb to check health endpoint
-resource "aws_security_group_rule" "fabio-http-check" {
-  security_group_id        = "${aws_security_group.fabio.id}"
-  type                     = "ingress"
-  from_port                = 9998
-  to_port                  = 9998
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.elb.id}"
 }
