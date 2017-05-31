@@ -41,7 +41,7 @@ EOF
 
 // We launch fabio into an ASG so that it can properly bring them up for us.
 resource "aws_autoscaling_group" "fabio" {
-  name_prefix               = "${format("%s-", var.name)}"
+  name                      = "${aws_launch_configuration.fabio.name}"
   launch_configuration      = "${aws_launch_configuration.fabio.name}"
   min_size                  = "${var.nodes}"
   max_size                  = "${var.nodes}"
@@ -56,6 +56,10 @@ resource "aws_autoscaling_group" "fabio" {
     value               = "${format("%s", var.name)}"
     propagate_at_launch = true
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_launch_configuration" "fabio" {
@@ -65,6 +69,10 @@ resource "aws_launch_configuration" "fabio" {
   iam_instance_profile = "${var.instance_profile}"
   security_groups      = ["${aws_security_group.fabio.id}"]
   user_data            = "${data.template_file.fabio.rendered}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 // Security group for fabio allows SSH and HTTP access (via "tcp" in
