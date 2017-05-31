@@ -41,11 +41,13 @@ EOF
 
 // We launch fabio into an ASG so that it can properly bring them up for us.
 resource "aws_autoscaling_group" "fabio" {
-  name                      = "${aws_launch_configuration.fabio.name}"
-  launch_configuration      = "${aws_launch_configuration.fabio.name}"
-  min_size                  = "${var.nodes}"
-  max_size                  = "${var.nodes}"
-  desired_capacity          = "${var.nodes}"
+  name                  = "${aws_launch_configuration.fabio.name}"
+  launch_configuration  = "${aws_launch_configuration.fabio.name}"
+  min_size              = "${var.nodes}"
+  max_size              = "${var.nodes}"
+  desired_capacity      = "${var.nodes}"
+  wait_for_elb_capacity = "${var.nodes}"
+
   health_check_grace_period = 15
   health_check_type         = "EC2"
   vpc_zone_identifier       = ["${split(",", var.subnets)}"]
