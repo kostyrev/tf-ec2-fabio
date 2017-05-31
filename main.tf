@@ -109,7 +109,7 @@ resource "aws_elb" "fabio" {
   name                        = "${format("%s", var.name)}"
   connection_draining         = true
   connection_draining_timeout = 400
-  internal                    = true
+  internal                    = false
   subnets                     = ["${split(",", var.subnets)}"]
   security_groups             = ["${aws_security_group.elb.id}"]
 
