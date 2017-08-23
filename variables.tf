@@ -13,6 +13,11 @@ variable "elb-health-check" {
   description = "Health check for fabio servers"
 }
 
+variable "internal-elb" {
+  default     = false
+  description = "Should elb for fabio be internal"
+}
+
 variable "instance_type" {
   default     = "m3.medium"
   description = "Instance type for fabio instances"
