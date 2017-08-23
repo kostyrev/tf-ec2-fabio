@@ -100,7 +100,7 @@ resource "aws_security_group_rule" "fabio-http-services" {
   from_port         = 9999
   to_port           = 9999
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = "${var.allowed_cidr}"
 }
 
 resource "aws_security_group_rule" "fabio-http-api" {

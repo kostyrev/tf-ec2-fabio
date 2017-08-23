@@ -65,3 +65,9 @@ variable "ssl_certificate_id" {
   description = "The id of certificate to use in elb"
   default     = ""
 }
+
+variable "allowed_cidr" {
+  type        = "list"
+  default     = ["0.0.0.0/0"]
+  description = "A list of CIDR Networks to allow access to services"
+}
